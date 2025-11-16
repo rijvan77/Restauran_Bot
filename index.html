@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>منوی رستوران</title>
+    <title>رستوران</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -13,64 +13,246 @@
         }
 
         :root {
-            --tg-theme-bg-color: #ffffff;
-            --tg-theme-text-color: #222222;
-            --tg-theme-hint-color: #999999;
-            --tg-theme-link-color: #2481cc;
-            --tg-theme-button-color: #2481cc;
-            --tg-theme-button-text-color: #ffffff;
-            --primary-color: #FF6B35;
-            --secondary-color: #F7931E;
-            --success-color: #4CAF50;
-            --danger-color: #f44336;
-            --dark-color: #2C3E50;
-            --light-color: #ECF0F1;
-            --shadow: 0 2px 10px rgba(0,0,0,0.1);
-            --shadow-hover: 0 4px 20px rgba(0,0,0,0.15);
+            --primary: #FF6B35;
+            --secondary: #F7931E;
+            --success: #4CAF50;
+            --danger: #f44336;
+            --dark: #2C3E50;
+            --light: #ECF0F1;
+            --nav-height: 70px;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--tg-theme-bg-color);
-            color: var(--tg-theme-text-color);
-            padding-bottom: 80px;
-            line-height: 1.6;
+            background: #f5f5f5;
+            padding-bottom: var(--nav-height);
+            overflow-x: hidden;
         }
 
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 20px;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow);
+        /* Pages Container */
+        .page {
+            display: none;
+            min-height: calc(100vh - var(--nav-height));
+            padding: 20px 15px;
+            animation: fadeIn 0.3s;
         }
 
-        .header h1 {
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Navigation Bar با افکت Liquid */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--nav-height);
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            padding: 0 10px;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            padding: 10px;
+        }
+
+        .nav-icon {
             font-size: 24px;
+            transition: all 0.3s;
+            margin-bottom: 4px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            color: #999;
+            transition: all 0.3s;
+        }
+
+        .nav-item.active {
+            transform: translateY(-8px);
+        }
+
+        .nav-item.active .nav-icon {
+            font-size: 28px;
+            transform: scale(1.1);
+        }
+
+        .nav-item.active .nav-label {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* Liquid Effect */
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            z-index: -1;
+            animation: liquidPulse 0.6s ease-out;
+        }
+
+        @keyframes liquidPulse {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.2;
+            }
+        }
+
+        /* Profile Page */
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 30px 20px;
+            border-radius: 0 0 30px 30px;
+            text-align: center;
+            color: white;
+            margin: -20px -15px 20px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid white;
+            margin: 0 auto 15px;
+            object-fit: cover;
+            background: white;
+        }
+
+        .profile-name {
+            font-size: 22px;
+            font-weight: bold;
             margin-bottom: 5px;
         }
 
-        .header p {
+        .profile-info {
             font-size: 14px;
             opacity: 0.9;
         }
 
-        /* Category Tabs */
+        .profile-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .profile-card-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-field {
+            margin-bottom: 15px;
+        }
+
+        .profile-field label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .profile-field input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .wallet-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .wallet-balance {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .wallet-amount {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        /* Menu Page */
+        .menu-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            margin: -20px -15px 20px;
+            text-align: center;
+        }
+
+        .menu-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
         .category-tabs {
             display: flex;
             overflow-x: auto;
-            background: white;
-            padding: 10px 15px;
             gap: 10px;
-            position: sticky;
-            top: 90px;
-            z-index: 99;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            -webkit-overflow-scrolling: touch;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
         }
 
         .category-tabs::-webkit-scrollbar {
@@ -80,8 +262,8 @@
         .category-tab {
             padding: 8px 20px;
             border-radius: 20px;
-            background: var(--light-color);
-            border: none;
+            background: white;
+            border: 2px solid transparent;
             cursor: pointer;
             white-space: nowrap;
             font-size: 14px;
@@ -90,28 +272,9 @@
         }
 
         .category-tab.active {
-            background: var(--primary-color);
+            background: var(--primary);
             color: white;
-        }
-
-        /* Menu Items */
-        .menu-container {
-            padding: 15px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .menu-category {
-            margin-bottom: 30px;
-        }
-
-        .category-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--light-color);
+            border-color: var(--primary);
         }
 
         .menu-item {
@@ -119,24 +282,17 @@
             border-radius: 15px;
             padding: 15px;
             margin-bottom: 15px;
-            box-shadow: var(--shadow);
-            transition: all 0.3s;
             display: flex;
             gap: 15px;
-        }
-
-        .menu-item:hover {
-            box-shadow: var(--shadow-hover);
-            transform: translateY(-2px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
 
         .menu-item-image {
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
             border-radius: 10px;
             object-fit: cover;
-            flex-shrink: 0;
-            background: var(--light-color);
+            background: var(--light);
         }
 
         .menu-item-details {
@@ -146,29 +302,16 @@
             justify-content: space-between;
         }
 
-        .menu-item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 5px;
-        }
-
         .menu-item-name {
             font-size: 16px;
             font-weight: bold;
-            color: var(--dark-color);
-        }
-
-        .menu-item-rating {
-            color: #FFA000;
-            font-size: 14px;
+            color: var(--dark);
         }
 
         .menu-item-description {
             font-size: 13px;
-            color: var(--tg-theme-hint-color);
-            margin-bottom: 10px;
-            line-height: 1.4;
+            color: #666;
+            margin: 5px 0;
         }
 
         .menu-item-footer {
@@ -178,143 +321,202 @@
         }
 
         .menu-item-price {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            color: var(--primary-color);
+            color: var(--primary);
         }
 
-        .add-to-cart-btn {
-            background: var(--primary-color);
+        .add-btn {
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 8px 20px;
-            border-radius: 20px;
+            padding: 6px 16px;
+            border-radius: 15px;
+            font-size: 13px;
             cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .add-to-cart-btn:hover {
-            background: var(--secondary-color);
-            transform: scale(1.05);
         }
 
         .quantity-control {
             display: flex;
             align-items: center;
-            gap: 10px;
-            background: var(--light-color);
-            padding: 5px 10px;
-            border-radius: 20px;
+            gap: 8px;
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 15px;
         }
 
         .quantity-btn {
-            width: 30px;
-            height: 30px;
+            width: 26px;
+            height: 26px;
             border: none;
-            background: var(--primary-color);
+            background: var(--primary);
             color: white;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 18px;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 16px;
         }
 
-        .quantity-btn:active {
-            transform: scale(0.95);
-        }
-
-        .quantity-display {
-            font-weight: bold;
-            min-width: 30px;
+        /* Ranking Page */
+        .ranking-header {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: white;
+            padding: 30px 20px;
+            margin: -20px -15px 20px;
+            border-radius: 0 0 30px 30px;
             text-align: center;
         }
 
-        /* Cart Button */
-        .cart-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .ranking-title {
             font-size: 24px;
-            transition: all 0.3s;
-            z-index: 1000;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
 
-        .cart-button:hover {
-            transform: scale(1.1);
-        }
-
-        .cart-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--danger-color);
-            color: white;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
+        .ranking-item {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 12px;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .ranking-badge {
+            font-size: 32px;
+            width: 50px;
+            text-align: center;
+        }
+
+        .ranking-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--light);
+        }
+
+        .ranking-info {
+            flex: 1;
+        }
+
+        .ranking-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .ranking-stats {
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* Referral Page */
+        .referral-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px 20px;
+            margin: -20px -15px 20px;
+            border-radius: 0 0 30px 30px;
+            text-align: center;
+        }
+
+        .referral-code-box {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .referral-code {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            background: var(--light);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            letter-spacing: 2px;
+        }
+
+        .reward-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .reward-icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .reward-title {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .reward-amount {
+            font-size: 24px;
+            color: var(--primary);
+            text-align: center;
             font-weight: bold;
         }
 
-        /* Cart Modal */
+        /* Cart Badge */
+        .cart-badge {
+            position: absolute;
+            top: 5px;
+            right: 50%;
+            margin-right: -25px;
+            background: var(--danger);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* Checkout Modal */
         .modal {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            bottom: var(--nav-height);
             background: rgba(0,0,0,0.5);
-            z-index: 2000;
+            z-index: 999;
             animation: fadeIn 0.3s;
         }
 
         .modal.active {
             display: flex;
             align-items: flex-end;
-            justify-content: center;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
         }
 
         .modal-content {
             background: white;
             width: 100%;
-            max-width: 600px;
-            max-height: 80vh;
+            max-height: 80%;
             border-radius: 20px 20px 0 0;
             padding: 20px;
             overflow-y: auto;
             animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
         }
 
         .modal-header {
@@ -323,12 +525,7 @@
             align-items: center;
             margin-bottom: 20px;
             padding-bottom: 15px;
-            border-bottom: 2px solid var(--light-color);
-        }
-
-        .modal-header h2 {
-            font-size: 22px;
-            color: var(--dark-color);
+            border-bottom: 2px solid var(--light);
         }
 
         .close-btn {
@@ -336,21 +533,22 @@
             border: none;
             font-size: 28px;
             cursor: pointer;
-            color: var(--tg-theme-hint-color);
+            color: #999;
         }
 
         .cart-item {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-            padding: 15px;
-            background: var(--light-color);
+            background: var(--light);
             border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
 
         .cart-item-image {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 8px;
             object-fit: cover;
         }
@@ -359,90 +557,21 @@
             flex: 1;
         }
 
-        .cart-item-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .cart-item-price {
-            color: var(--primary-color);
-            font-size: 14px;
-        }
-
-        .cart-total {
-            background: var(--primary-color);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .cart-total-label {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-
-        .cart-total-price {
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .checkout-btn {
-            width: 100%;
-            padding: 15px;
-            background: var(--success-color);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .checkout-btn:hover {
-            background: #45a049;
-            transform: scale(1.02);
-        }
-
-        .checkout-btn:disabled {
-            background: var(--tg-theme-hint-color);
-            cursor: not-allowed;
-        }
-
-        /* Checkout Page */
-        .checkout-container {
-            display: none;
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .checkout-container.active {
-            display: block;
-        }
-
         .payment-option {
             background: white;
-            padding: 15px;
+            border: 2px solid #ddd;
             border-radius: 10px;
-            margin-bottom: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
             cursor: pointer;
             transition: all 0.3s;
-            border: 2px solid transparent;
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
-        .payment-option:hover {
-            border-color: var(--primary-color);
-        }
-
         .payment-option.selected {
-            border-color: var(--primary-color);
+            border-color: var(--primary);
             background: #fff5f2;
         }
 
@@ -453,404 +582,326 @@
 
         .payment-icon {
             font-size: 32px;
-            width: 50px;
+        }
+
+        .empty-state {
             text-align: center;
+            padding: 60px 20px;
+            color: #999;
         }
 
-        .payment-info {
-            flex: 1;
-        }
-
-        .payment-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .payment-description {
-            font-size: 13px;
-            color: var(--tg-theme-hint-color);
-        }
-
-        .wallet-balance {
-            color: var(--success-color);
-            font-weight: bold;
-        }
-
-        .order-summary {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .summary-row.total {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--primary-color);
-            padding-top: 10px;
-            border-top: 2px solid var(--light-color);
-        }
-
-        .confirm-order-btn {
-            width: 100%;
-            padding: 15px;
-            background: var(--success-color);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .confirm-order-btn:disabled {
-            background: var(--tg-theme-hint-color);
-            cursor: not-allowed;
-        }
-
-        .back-btn {
-            width: 100%;
-            padding: 15px;
-            background: white;
-            color: var(--dark-color);
-            border: 2px solid var(--light-color);
-            border-radius: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-bottom: 10px;
-            transition: all 0.3s;
-        }
-
-        .empty-cart {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--tg-theme-hint-color);
-        }
-
-        .empty-cart-icon {
+        .empty-icon {
             font-size: 64px;
             margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <h1>🍕 منوی رستوران</h1>
-        <p>سفارش آنلاین با بهترین کیفیت</p>
+    <!-- Profile Page -->
+    <div class="page active" id="profilePage">
+        <div class="profile-header">
+            <img src="" alt="Profile" class="profile-avatar" id="profileAvatar">
+            <div class="profile-name" id="profileName">کاربر</div>
+            <div class="profile-info" id="profileUsername">@username</div>
+        </div>
+
+        <div class="wallet-card">
+            <div class="wallet-balance">موجودی کیف پول</div>
+            <div class="wallet-amount" id="walletAmount">0 تومان</div>
+        </div>
+
+        <div class="profile-card">
+            <div class="profile-card-title">
+                📝 اطلاعات شخصی
+            </div>
+            <div class="profile-field">
+                <label>نام کامل</label>
+                <input type="text" id="fullName" placeholder="نام خود را وارد کنید">
+            </div>
+            <div class="profile-field">
+                <label>شماره تلفن</label>
+                <input type="tel" id="phoneNumber" placeholder="09xxxxxxxxx">
+            </div>
+            <div class="profile-field">
+                <label>آدرس</label>
+                <input type="text" id="address" placeholder="آدرس کامل خود را وارد کنید">
+            </div>
+            <button class="btn-primary" onclick="saveProfile()">ذخیره تغییرات</button>
+        </div>
+
+        <div class="profile-card">
+            <div class="profile-card-title">
+                🎫 کد معرف شما
+            </div>
+            <div class="referral-code" id="profileReferralCode">LOADING...</div>
+        </div>
     </div>
 
-    <!-- Category Tabs -->
-    <div class="category-tabs" id="categoryTabs">
-        <button class="category-tab active" data-category="all">همه</button>
-        <button class="category-tab" data-category="غذای اصلی">غذای اصلی</button>
-        <button class="category-tab" data-category="فست فود">فست فود</button>
-        <button class="category-tab" data-category="نوشیدنی">نوشیدنی</button>
-        <button class="category-tab" data-category="دسر">دسر</button>
+    <!-- Menu Page -->
+    <div class="page" id="menuPage">
+        <div class="menu-header">
+            <h1>🍽 منوی رستوران</h1>
+            <p>سفارش آنلاین با بهترین کیفیت</p>
+        </div>
+
+        <div class="category-tabs" id="categoryTabs">
+            <button class="category-tab active" data-category="all">همه</button>
+            <button class="category-tab" data-category="غذای اصلی">غذای اصلی</button>
+            <button class="category-tab" data-category="فست فود">فست فود</button>
+            <button class="category-tab" data-category="نوشیدنی">نوشیدنی</button>
+            <button class="category-tab" data-category="دسر">دسر</button>
+        </div>
+
+        <div id="menuContainer"></div>
     </div>
 
-    <!-- Menu Container -->
-    <div class="menu-container" id="menuContainer"></div>
+    <!-- Ranking Page -->
+    <div class="page" id="rankingPage">
+        <div class="ranking-header">
+            <div class="ranking-title">🏆 رنکینگ مشتریان برتر</div>
+            <p>برترین‌های این هفته</p>
+        </div>
+        <div id="rankingContainer"></div>
+    </div>
 
-    <!-- Cart Button -->
-    <button class="cart-button" id="cartButton">
-        🛒
-        <span class="cart-badge" id="cartBadge">0</span>
-    </button>
+    <!-- Referral Page -->
+    <div class="page" id="referralPage">
+        <div class="referral-header">
+            <h1>🎁 دعوت از دوستان</h1>
+            <p>دوستان خود را دعوت کنید و جایزه بگیرید!</p>
+        </div>
+
+        <div class="referral-code-box">
+            <div style="color: #666; font-size: 14px; margin-bottom: 10px;">کد معرف شما</div>
+            <div class="referral-code" id="referralCode">LOADING...</div>
+            <button class="btn-primary" style="margin-top: 15px;" onclick="shareReferral()">
+                📤 اشتراک‌گذاری لینک دعوت
+            </button>
+        </div>
+
+        <div class="reward-card">
+            <div class="reward-icon">💰</div>
+            <div class="reward-title">برای هر دوست</div>
+            <div class="reward-amount">50,000 تومان</div>
+        </div>
+
+        <div class="reward-card">
+            <div class="reward-icon">🎉</div>
+            <div class="reward-title">برای دوست شما</div>
+            <div class="reward-amount">25,000 تومان</div>
+        </div>
+
+        <div class="profile-card">
+            <div class="profile-card-title">📊 آمار دعوت‌های شما</div>
+            <div style="text-align: center; padding: 20px;">
+                <div style="font-size: 48px; font-weight: bold; color: var(--primary);" id="referralCount">0</div>
+                <div style="color: #666;">نفر دعوت شده</div>
+            </div>
+        </div>
+    </div>
 
     <!-- Cart Modal -->
     <div class="modal" id="cartModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>🛒 سبد خرید</h2>
-                <button class="close-btn" id="closeCartBtn">&times;</button>
+                <button class="close-btn" onclick="closeCart()">&times;</button>
             </div>
             <div id="cartItems"></div>
-            <div class="cart-total" id="cartTotal" style="display: none;">
-                <div class="cart-total-label">مجموع سفارش:</div>
-                <div class="cart-total-price" id="totalPrice">0 تومان</div>
+            <div style="background: var(--primary); color: white; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0;" id="cartTotal">
+                <div style="opacity: 0.9; margin-bottom: 5px;">مجموع:</div>
+                <div style="font-size: 28px; font-weight: bold;" id="totalPrice">0 تومان</div>
             </div>
-            <button class="checkout-btn" id="checkoutBtn" disabled>ادامه و تسویه حساب</button>
+
+            <!-- Payment Options -->
+            <div id="paymentSection" style="display: none;">
+                <h3 style="margin-bottom: 15px;">💳 انتخاب روش پرداخت</h3>
+                <div class="payment-option" data-method="COD">
+                    <div class="payment-icon">💵</div>
+                    <div>
+                        <div style="font-weight: bold;">پرداخت در محل</div>
+                        <div style="font-size: 12px; color: #666;">پرداخت نقدی هنگام دریافت</div>
+                    </div>
+                </div>
+                <div class="payment-option" data-method="Card2Card">
+                    <div class="payment-icon">💳</div>
+                    <div>
+                        <div style="font-weight: bold;">کارت به کارت</div>
+                        <div style="font-size: 12px; color: #666;">انتقال به شماره کارت</div>
+                    </div>
+                </div>
+                <div class="payment-option" data-method="Wallet">
+                    <div class="payment-icon">👛</div>
+                    <div>
+                        <div style="font-weight: bold;">کیف پول</div>
+                        <div style="font-size: 12px; color: var(--success);" id="walletBalanceText">موجودی: 0 تومان</div>
+                    </div>
+                </div>
+                <div class="payment-option disabled" data-method="Gateway">
+                    <div class="payment-icon">🏦</div>
+                    <div>
+                        <div style="font-weight: bold;">درگاه بانکی</div>
+                        <div style="font-size: 12px; color: #666;">به زودی...</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-primary" id="checkoutBtn" onclick="proceedToCheckout()">ادامه خرید</button>
+            <button class="btn-primary" id="confirmOrderBtn" style="display: none; background: var(--success);" onclick="confirmOrder()">
+                تایید و ثبت سفارش
+            </button>
         </div>
     </div>
 
-    <!-- Checkout Container -->
-    <div class="checkout-container" id="checkoutContainer">
-        <h2 style="margin-bottom: 20px; color: var(--dark-color);">💳 انتخاب روش پرداخت</h2>
-        
-        <div class="order-summary">
-            <h3 style="margin-bottom: 15px;">خلاصه سفارش:</h3>
-            <div id="checkoutSummary"></div>
-            <div class="summary-row total">
-                <span>مجموع:</span>
-                <span id="checkoutTotal">0 تومان</span>
-            </div>
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <div class="nav-item active" onclick="switchPage('profile')">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">پروفایل</div>
         </div>
-
-        <div class="payment-option" data-method="COD">
-            <div class="payment-icon">💵</div>
-            <div class="payment-info">
-                <div class="payment-title">پرداخت در محل</div>
-                <div class="payment-description">پرداخت نقدی هنگام دریافت سفارش</div>
-            </div>
+        <div class="nav-item" onclick="switchPage('menu')">
+            <div class="nav-icon">🍽</div>
+            <div class="nav-label">منو</div>
+            <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
         </div>
-
-        <div class="payment-option" data-method="Card2Card">
-            <div class="payment-icon">💳</div>
-            <div class="payment-info">
-                <div class="payment-title">کارت به کارت</div>
-                <div class="payment-description">انتقال وجه به شماره کارت رستوران</div>
-            </div>
+        <div class="nav-item" onclick="switchPage('ranking')">
+            <div class="nav-icon">🏆</div>
+            <div class="nav-label">رنکینگ</div>
         </div>
-
-        <div class="payment-option" data-method="Wallet">
-            <div class="payment-icon">👛</div>
-            <div class="payment-info">
-                <div class="payment-title">کیف پول</div>
-                <div class="payment-description">
-                    موجودی: <span class="wallet-balance" id="walletBalance">0 تومان</span>
-                </div>
-            </div>
+        <div class="nav-item" onclick="switchPage('referral')">
+            <div class="nav-icon">🎁</div>
+            <div class="nav-label">دعوت</div>
         </div>
-
-        <div class="payment-option disabled" data-method="Gateway">
-            <div class="payment-icon">🏦</div>
-            <div class="payment-info">
-                <div class="payment-title">درگاه بانکی</div>
-                <div class="payment-description">به زودی فعال می‌شود</div>
-            </div>
-        </div>
-
-        <button class="confirm-order-btn" id="confirmOrderBtn" disabled>تایید و ثبت سفارش</button>
-        <button class="back-btn" id="backToCartBtn">بازگشت به سبد خرید</button>
     </div>
 
     <script>
-        // Initialize Telegram WebApp
         let tg = window.Telegram.WebApp;
         tg.expand();
-        tg.enableClosingConfirmation();
-
-        // Sample Menu Data (در پروژه واقعی از API دریافت می‌شود)
-        const menuData = [
-            {
-                id: 1,
-                name: "چلو کباب کوبیده",
-                description: "کباب کوبیده مرغوب با برنج ایرانی و گوجه کبابی",
-                price: 150000,
-                category: "غذای اصلی",
-                image: "https://via.placeholder.com/100x100/FF6B35/FFFFFF?text=کباب",
-                rating: "⭐ 4.8"
-            },
-            {
-                id: 2,
-                name: "پیتزا پپرونی",
-                description: "پیتزا خانواده با پپرونی و پنیر موزارلا",
-                price: 280000,
-                category: "فست فود",
-                image: "https://via.placeholder.com/100x100/F7931E/FFFFFF?text=پیتزا",
-                rating: "⭐ 4.9"
-            },
-            {
-                id: 3,
-                name: "برگر مخصوص",
-                description: "برگر گوشت با سس مخصوص و سیب زمینی",
-                price: 120000,
-                category: "فست فود",
-                image: "https://via.placeholder.com/100x100/4CAF50/FFFFFF?text=برگر",
-                rating: "⭐ 4.7"
-            },
-            {
-                id: 4,
-                name: "نوشابه",
-                description: "نوشابه قوطی سرد",
-                price: 15000,
-                category: "نوشیدنی",
-                image: "https://via.placeholder.com/100x100/2196F3/FFFFFF?text=نوشابه",
-                rating: "⭐ 4.5"
-            },
-            {
-                id: 5,
-                name: "بستنی وانیلی",
-                description: "بستنی خانگی با طعم وانیل",
-                price: 35000,
-                category: "دسر",
-                image: "https://via.placeholder.com/100x100/E91E63/FFFFFF?text=بستنی",
-                rating: "⭐ 4.6"
-            },
-            {
-                id: 6,
-                name: "جوجه کباب",
-                description: "جوجه کباب با زعفران و برنج",
-                price: 180000,
-                category: "غذای اصلی",
-                image: "https://via.placeholder.com/100x100/FF6B35/FFFFFF?text=جوجه",
-                rating: "⭐ 4.9"
-            }
-        ];
-
-        // Cart State
+        
         let cart = [];
         let selectedPaymentMethod = null;
-        let walletBalance = 0; // این مقدار از API دریافت می‌شود
+        let walletBalance = 0;
+        let userInfo = {};
 
-        // دریافت موجودی کیف پول از تلگرام
-        function getWalletBalance() {
-            // در پروژه واقعی، این مقدار از ربات تلگرام دریافت می‌شود
-            // می‌توانید از InitData تلگرام استفاده کنید
-            walletBalance = 100000; // مثال: 100,000 تومان
-            document.getElementById('walletBalance').textContent = formatPrice(walletBalance);
-        }
+        const menuData = [
+            { id: 1, name: "چلو کباب", description: "کباب کوبیده با برنج", price: 150000, category: "غذای اصلی", image: "https://via.placeholder.com/90/FF6B35/FFFFFF?text=کباب" },
+            { id: 2, name: "پیتزا پپرونی", description: "پیتزا خانواده", price: 280000, category: "فست فود", image: "https://via.placeholder.com/90/F7931E/FFFFFF?text=پیتزا" },
+            { id: 3, name: "برگر مخصوص", description: "با سیب زمینی", price: 120000, category: "فست فود", image: "https://via.placeholder.com/90/4CAF50/FFFFFF?text=برگر" },
+            { id: 4, name: "نوشابه", description: "قوطی سرد", price: 15000, category: "نوشیدنی", image: "https://via.placeholder.com/90/2196F3/FFFFFF?text=نوشابه" },
+            { id: 5, name: "بستنی", description: "وانیلی خانگی", price: 35000, category: "دسر", image: "https://via.placeholder.com/90/E91E63/FFFFFF?text=بستنی" }
+        ];
 
-        // Format Price
         function formatPrice(price) {
             return price.toLocaleString('fa-IR') + ' تومان';
         }
 
-        // Render Menu
+        function switchPage(pageName) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(pageName + 'Page').classList.add('active');
+            event.currentTarget.classList.add('active');
+
+            if (pageName === 'ranking') loadRanking();
+        }
+
         function renderMenu(category = 'all') {
             const container = document.getElementById('menuContainer');
             container.innerHTML = '';
 
-            const filteredMenu = category === 'all' 
-                ? menuData 
-                : menuData.filter(item => item.category === category);
+            const filtered = category === 'all' ? menuData : menuData.filter(i => i.category === category);
 
-            const categories = [...new Set(filteredMenu.map(item => item.category))];
+            filtered.forEach(item => {
+                const cartItem = cart.find(c => c.id === item.id);
+                const qty = cartItem ? cartItem.quantity : 0;
 
-            categories.forEach(cat => {
-                const categorySection = document.createElement('div');
-                categorySection.className = 'menu-category';
-
-                const categoryTitle = document.createElement('div');
-                categoryTitle.className = 'category-title';
-                categoryTitle.textContent = cat;
-                categorySection.appendChild(categoryTitle);
-
-                const items = filteredMenu.filter(item => item.category === cat);
-                items.forEach(item => {
-                    const cartItem = cart.find(c => c.id === item.id);
-                    const quantity = cartItem ? cartItem.quantity : 0;
-
-                    const menuItem = document.createElement('div');
-                    menuItem.className = 'menu-item';
-                    menuItem.innerHTML = `
-                        <img src="${item.image}" alt="${item.name}" class="menu-item-image">
+                container.innerHTML += `
+                    <div class="menu-item">
+                        <img src="${item.image}" class="menu-item-image">
                         <div class="menu-item-details">
-                            <div class="menu-item-header">
-                                <div class="menu-item-name">${item.name}</div>
-                                <div class="menu-item-rating">${item.rating}</div>
-                            </div>
+                            <div class="menu-item-name">${item.name}</div>
                             <div class="menu-item-description">${item.description}</div>
                             <div class="menu-item-footer">
                                 <div class="menu-item-price">${formatPrice(item.price)}</div>
-                                ${quantity > 0 ? `
+                                ${qty > 0 ? `
                                     <div class="quantity-control">
-                                        <button class="quantity-btn" onclick="changeQuantity(${item.id}, -1)">−</button>
-                                        <div class="quantity-display">${quantity}</div>
-                                        <button class="quantity-btn" onclick="changeQuantity(${item.id}, 1)">+</button>
+                                        <button class="quantity-btn" onclick="changeQty(${item.id}, -1)">−</button>
+                                        <span>${qty}</span>
+                                        <button class="quantity-btn" onclick="changeQty(${item.id}, 1)">+</button>
                                     </div>
                                 ` : `
-                                    <button class="add-to-cart-btn" onclick="addToCart(${item.id})">
-                                        افزودن +
-                                    </button>
+                                    <button class="add-btn" onclick="addToCart(${item.id})">افزودن +</button>
                                 `}
                             </div>
                         </div>
-                    `;
-                    categorySection.appendChild(menuItem);
-                });
-
-                container.appendChild(categorySection);
+                    </div>
+                `;
             });
         }
 
-        // Category Tabs
-        document.getElementById('categoryTabs').addEventListener('click', (e) => {
-            if (e.target.classList.contains('category-tab')) {
-                document.querySelectorAll('.category-tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                e.target.classList.add('active');
-                renderMenu(e.target.dataset.category);
-            }
-        });
-
-        // Add to Cart
-        function addToCart(itemId) {
-            const item = menuData.find(i => i.id === itemId);
-            const existingItem = cart.find(c => c.id === itemId);
-
-            if (existingItem) {
-                existingItem.quantity++;
+        function addToCart(id) {
+            const item = menuData.find(i => i.id === id);
+            const existing = cart.find(c => c.id === id);
+            
+            if (existing) {
+                existing.quantity++;
             } else {
                 cart.push({ ...item, quantity: 1 });
             }
-
+            
             updateCart();
             renderMenu(document.querySelector('.category-tab.active').dataset.category);
-            
-            // Haptic feedback
             tg.HapticFeedback.impactOccurred('light');
         }
 
-        // Change Quantity
-        function changeQuantity(itemId, change) {
-            const item = cart.find(c => c.id === itemId);
+        function changeQty(id, change) {
+            const item = cart.find(c => c.id === id);
             if (item) {
                 item.quantity += change;
                 if (item.quantity <= 0) {
-                    cart = cart.filter(c => c.id !== itemId);
+                    cart = cart.filter(c => c.id !== id);
                 }
                 updateCart();
                 renderMenu(document.querySelector('.category-tab.active').dataset.category);
-                renderCartItems();
-                
-                tg.HapticFeedback.impactOccurred('light');
             }
         }
 
-        // Update Cart Badge and Button
         function updateCart() {
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const total = cart.reduce((sum, item) => sum + item.quantity, 0);
             const badge = document.getElementById('cartBadge');
-            badge.textContent = totalItems;
-            badge.style.display = totalItems > 0 ? 'flex' : 'none';
+            
+            if (total > 0) {
+                badge.textContent = total;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
         }
 
-        // Cart Modal
-        document.getElementById('cartButton').addEventListener('click', () => {
+        function openCart() {
             document.getElementById('cartModal').classList.add('active');
             renderCartItems();
-        });
+        }
 
-        document.getElementById('closeCartBtn').addEventListener('click', () => {
+        function closeCart() {
             document.getElementById('cartModal').classList.remove('active');
-        });
+            document.getElementById('paymentSection').style.display = 'none';
+            document.getElementById('checkoutBtn').style.display = 'block';
+            document.getElementById('confirmOrderBtn').style.display = 'none';
+        }
 
-        // Render Cart Items
         function renderCartItems() {
             const container = document.getElementById('cartItems');
-            const totalElement = document.getElementById('cartTotal');
-            const checkoutBtn = document.getElementById('checkoutBtn');
-
+            
             if (cart.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-cart">
-                        <div class="empty-cart-icon">🛒</div>
+                    <div class="empty-state">
+                        <div class="empty-icon">🛒</div>
                         <p>سبد خرید شما خالی است</p>
                     </div>
                 `;
-                totalElement.style.display = 'none';
-                checkoutBtn.disabled = true;
+                document.getElementById('cartTotal').style.display = 'none';
+                document.getElementById('checkoutBtn').disabled = true;
                 return;
             }
 
@@ -858,101 +909,36 @@
             let total = 0;
 
             cart.forEach(item => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item';
-                cartItem.innerHTML = `
-                    <img src="${item.image}" alt="${item.name}" class="cart-item-image">
-                    <div class="cart-item-details">
-                        <div class="cart-item-name">${item.name}</div>
-                        <div class="cart-item-price">${formatPrice(item.price)} × ${item.quantity}</div>
-                    </div>
-                    <div class="quantity-control">
-                        <button class="quantity-btn" onclick="changeQuantity(${item.id}, -1)">−</button>
-                        <div class="quantity-display">${item.quantity}</div>
-                        <button class="quantity-btn" onclick="changeQuantity(${item.id}, 1)">+</button>
+                total += item.price * item.quantity;
+                container.innerHTML += `
+                    <div class="cart-item">
+                        <img src="${item.image}" class="cart-item-image">
+                        <div class="cart-item-details">
+                            <div style="font-weight: bold;">${item.name}</div>
+                            <div style="font-size: 12px; color: #666;">${formatPrice(item.price)} × ${item.quantity}</div>
+                        </div>
+                        <div class="quantity-control">
+                            <button class="quantity-btn" onclick="changeQty(${item.id}, -1); renderCartItems();">−</button>
+                            <span>${item.quantity}</span>
+                            <button class="quantity-btn" onclick="changeQty(${item.id}, 1); renderCartItems();">+</button>
+                        </div>
                     </div>
                 `;
-                container.appendChild(cartItem);
             });
 
             document.getElementById('totalPrice').textContent = formatPrice(total);
-            totalElement.style.display = 'block';
-            checkoutBtn.disabled = false;
+            document.getElementById('cartTotal').style.display = 'block';
+            document.getElementById('checkoutBtn').disabled = false;
         }
 
-        // Checkout Button
-        document.getElementById('checkoutBtn').addEventListener('click', () => {
-            document.getElementById('cartModal').classList.remove('active');
-            document.getElementById('menuContainer').style.display = 'none';
-            document.querySelector('.category-tabs').style.display = 'none';
-            document.getElementById('cartButton').style.display = 'none';
-            document.getElementById('checkoutContainer').classList.add('active');
-            renderCheckoutSummary();
-        });
-
-        // Back to Cart
-        document.getElementById('backToCartBtn').addEventListener('click', () => {
-            document.getElementById('checkoutContainer').classList.remove('active');
-            document.getElementById('menuContainer').style.display = 'block';
-            document.querySelector('.category-tabs').style.display = 'flex';
-            document.getElementById('cartButton').style.display = 'flex';
-            selectedPaymentMethod = null;
-            document.getElementById('confirmOrderBtn').disabled = true;
-            document.querySelectorAll('.payment-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-        });
-
-        // Render Checkout Summary
-        function renderCheckoutSummary() {
-            const container = document.getElementById('checkoutSummary');
-            container.innerHTML = '';
-
-            cart.forEach(item => {
-                const row = document.createElement('div');
-                row.className = 'summary-row';
-                row.innerHTML = `
-                    <span>${item.name} × ${item.quantity}</span>
-                    <span>${formatPrice(item.price * item.quantity)}</span>
-                `;
-                container.appendChild(row);
-            });
-
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            document.getElementById('checkoutTotal').textContent = formatPrice(total);
+        function proceedToCheckout() {
+            document.getElementById('checkoutBtn').style.display = 'none';
+            document.getElementById('paymentSection').style.display = 'block';
+            document.getElementById('confirmOrderBtn').style.display = 'block';
+            document.getElementById('walletBalanceText').textContent = `موجودی: ${formatPrice(walletBalance)}`;
         }
 
-        // Payment Method Selection
-        document.querySelectorAll('.payment-option').forEach(option => {
-            option.addEventListener('click', function() {
-                if (this.classList.contains('disabled')) return;
-
-                const method = this.dataset.method;
-                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-                // بررسی موجودی کیف پول
-                if (method === 'Wallet' && walletBalance < total) {
-                    tg.showAlert('موجودی کیف پول شما کافی نیست!');
-                    tg.HapticFeedback.notificationOccurred('error');
-                    return;
-                }
-
-                document.querySelectorAll('.payment-option').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                this.classList.add('selected');
-                selectedPaymentMethod = method;
-                document.getElementById('confirmOrderBtn').disabled = false;
-
-                tg.HapticFeedback.selectionChanged();
-            });
-        });
-
-        // Confirm Order
-        document.getElementById('confirmOrderBtn').addEventListener('click', () => {
+        function confirmOrder() {
             if (!selectedPaymentMethod) {
                 tg.showAlert('لطفاً روش پرداخت را انتخاب کنید');
                 return;
@@ -960,8 +946,13 @@
 
             const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-            // آماده‌سازی داده‌های سفارش برای ارسال به ربات
+            if (selectedPaymentMethod === 'Wallet' && walletBalance < total) {
+                tg.showAlert('موجودی کیف پول کافی نیست!');
+                return;
+            }
+
             const orderData = {
+                action: 'place_order',
                 items: cart.map(item => ({
                     food_id: item.id,
                     name: item.name,
@@ -969,66 +960,125 @@
                     price: item.price
                 })),
                 total_price: total,
-                payment_method: selectedPaymentMethod,
-                timestamp: new Date().toISOString()
+                payment_method: selectedPaymentMethod
             };
 
-            // ارسال داده به ربات تلگرام
             tg.sendData(JSON.stringify(orderData));
+            tg.close();
+        }
 
-            // نمایش پیام تایید
-            tg.showAlert('سفارش شما با موفقیت ثبت شد! ✅', () => {
-                tg.close();
-            });
+        function saveProfile() {
+            const profileData = {
+                action: 'update_profile',
+                full_name: document.getElementById('fullName').value,
+                phone_number: document.getElementById('phoneNumber').value,
+                address: document.getElementById('address').value
+            };
 
+            if (!profileData.full_name || !profileData.phone_number) {
+                tg.showAlert('لطفاً نام و شماره تلفن را وارد کنید');
+                return;
+            }
+
+            tg.sendData(JSON.stringify(profileData));
+            tg.showAlert('✅ اطلاعات ذخیره شد');
             tg.HapticFeedback.notificationOccurred('success');
+        }
+
+        function loadRanking() {
+            const container = document.getElementById('rankingContainer');
+            const rankings = [
+                { rank: 1, name: 'علی احمدی', orders: 25, avatar: '👨' },
+                { rank: 2, name: 'مریم رضایی', orders: 22, avatar: '👩' },
+                { rank: 3, name: 'محمد کریمی', orders: 18, avatar: '👨' },
+                { rank: 4, name: 'فاطمه نوری', orders: 15, avatar: '👩' },
+                { rank: 5, name: 'رضا حسینی', orders: 12, avatar: '👨' }
+            ];
+
+            const medals = { 1: '🥇', 2: '🥈', 3: '🥉' };
+
+            container.innerHTML = rankings.map(r => `
+                <div class="ranking-item">
+                    <div class="ranking-badge">${medals[r.rank] || r.rank}</div>
+                    <div style="font-size: 32px;">${r.avatar}</div>
+                    <div class="ranking-info">
+                        <div class="ranking-name">${r.name}</div>
+                        <div class="ranking-stats">🛒 ${r.orders} سفارش</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function shareReferral() {
+            const code = document.getElementById('referralCode').textContent;
+            const botUsername = 'YourBotUsername'; // باید username ربات را وارد کنید
+            const url = `https://t.me/${botUsername}?start=${code}`;
+            const text = `🎁 به ربات رستوران بپیوندید و با کد معرف من ${code} جایزه بگیرید!`;
+            
+            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`);
+        }
+
+        // Category tabs
+        document.getElementById('categoryTabs').addEventListener('click', (e) => {
+            if (e.target.classList.contains('category-tab')) {
+                document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                renderMenu(e.target.dataset.category);
+            }
+        });
+
+        // Payment selection
+        document.querySelectorAll('.payment-option').forEach(opt => {
+            opt.addEventListener('click', function() {
+                if (this.classList.contains('disabled')) return;
+
+                document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedPaymentMethod = this.dataset.method;
+                tg.HapticFeedback.selectionChanged();
+            });
+        });
+
+        // Cart badge click
+        document.getElementById('cartBadge').parentElement.addEventListener('click', (e) => {
+            if (e.target.closest('.cart-badge')) {
+                openCart();
+            }
         });
 
         // Initialize
         window.addEventListener('DOMContentLoaded', () => {
-            getWalletBalance();
+            // Get user info from Telegram
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                userInfo = tg.initDataUnsafe.user;
+                document.getElementById('profileName').textContent = userInfo.first_name + (userInfo.last_name ? ' ' + userInfo.last_name : '');
+                document.getElementById('profileUsername').textContent = userInfo.username ? '@' + userInfo.username : '';
+                document.getElementById('fullName').value = userInfo.first_name + (userInfo.last_name ? ' ' + userInfo.last_name : '');
+                
+                // Set profile photo
+                if (userInfo.photo_url) {
+                    document.getElementById('profileAvatar').src = userInfo.photo_url;
+                } else {
+                    document.getElementById('profileAvatar').src = 'https://via.placeholder.com/100/667eea/ffffff?text=' + userInfo.first_name.charAt(0);
+                }
+            }
+
+            // Sample data (در پروژه واقعی از API دریافت شود)
+            walletBalance = 100000;
+            document.getElementById('walletAmount').textContent = formatPrice(walletBalance);
+            document.getElementById('referralCode').textContent = 'REF' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            document.getElementById('profileReferralCode').textContent = document.getElementById('referralCode').textContent;
+            document.getElementById('referralCount').textContent = '3';
+
             renderMenu();
             updateCart();
 
-            // تنظیم رنگ‌های تم تلگرام
+            // Apply Telegram theme
             if (tg.themeParams) {
-                document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#ffffff');
-                document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color || '#222222');
-                document.documentElement.style.setProperty('--tg-theme-hint-color', tg.themeParams.hint_color || '#999999');
-                document.documentElement.style.setProperty('--tg-theme-link-color', tg.themeParams.link_color || '#2481cc');
-                document.documentElement.style.setProperty('--tg-theme-button-color', tg.themeParams.button_color || '#2481cc');
-                document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.themeParams.button_text_color || '#ffffff');
-            }
-
-            // تنظیم MainButton تلگرام (اختیاری)
-            tg.MainButton.setText('مشاهده سبد خرید');
-            tg.MainButton.onClick(() => {
-                document.getElementById('cartButton').click();
-            });
-            
-            // نمایش MainButton وقتی سبد خالی نیست
-            if (cart.length > 0) {
-                tg.MainButton.show();
+                document.documentElement.style.setProperty('--tg-bg', tg.themeParams.bg_color || '#ffffff');
+                document.documentElement.style.setProperty('--tg-text', tg.themeParams.text_color || '#000000');
             }
         });
-
-        // بروزرسانی MainButton هنگام تغییر سبد
-        function updateMainButton() {
-            if (cart.length > 0) {
-                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                tg.MainButton.setText(`مشاهده سبد خرید (${formatPrice(total)})`);
-                tg.MainButton.show();
-            } else {
-                tg.MainButton.hide();
-            }
-        }
-
-        // بروزرسانی تابع updateCart
-        const originalUpdateCart = updateCart;
-        updateCart = function() {
-            originalUpdateCart();
-            updateMainButton();
-        };
     </script>
 </body>
 </html>
