@@ -627,6 +627,9 @@
                 <input type="text" id="address" placeholder="آدرس کامل خود را وارد کنید">
             </div>
             <button class="btn-primary" onclick="saveProfile()">ذخیره تغییرات</button>
+            <button class="btn-primary" style="background: #4CAF50; margin-top: 10px;" onclick="testSendData()">
+                🧪 تست ارسال داده
+            </button>
         </div>
 
         <div class="profile-card">
@@ -963,8 +966,34 @@
                 payment_method: selectedPaymentMethod
             };
 
-            tg.sendData(JSON.stringify(orderData));
-            tg.close();
+            console.log('📦 داده سفارش:', orderData);
+
+            try {
+                const dataString = JSON.stringify(orderData);
+                console.log('📤 ارسال سفارش به ربات:', dataString);
+                
+                if (tg.sendData) {
+                    tg.sendData(dataString);
+                    console.log('✅ سفارش ارسال شد');
+                    
+                    tg.showAlert('✅ سفارش شما ثبت شد!\n\nلطفاً منتظر تایید باشید.');
+                    
+                    // پاک کردن سبد خرید
+                    cart = [];
+                    updateCart();
+                    
+                    // بستن WebApp
+                    setTimeout(() => {
+                        tg.close();
+                    }, 1500);
+                } else {
+                    console.error('❌ tg.sendData موجود نیست!');
+                    tg.showAlert('خطا در ارسال سفارش. لطفاً دوباره تلاش کنید.');
+                }
+            } catch (error) {
+                console.error('❌ خطا در ارسال سفارش:', error);
+                tg.showAlert('خطا: ' + error.message);
+            }
         }
 
         function saveProfile() {
@@ -980,9 +1009,60 @@
                 return;
             }
 
-            tg.sendData(JSON.stringify(profileData));
-            tg.showAlert('✅ اطلاعات ذخیره شد');
-            tg.HapticFeedback.notificationOccurred('success');
+            // ذخیره محلی
+            localStorage.setItem('userProfile', JSON.stringify(profileData));
+            console.log('✅ داده در localStorage ذخیره شد');
+
+            // تلاش برای ارسال به ربات
+            try {
+                const dataString = JSON.stringify(profileData);
+                console.log('📤 ارسال داده به ربات:', dataString);
+                
+                // روش 1: استفاده از sendData (استاندارد)
+                if (tg.sendData) {
+                    tg.sendData(dataString);
+                    console.log('✅ داده با sendData ارسال شد');
+                } else {
+                    console.error('❌ tg.sendData موجود نیست!');
+                }
+                
+                // نمایش پیام موفقیت
+                tg.showAlert('✅ اطلاعات ذخیره شد!\n\nبرای تکمیل ثبت، ربات را ببندید و دوباره باز کنید.');
+                tg.HapticFeedback.notificationOccurred('success');
+                
+                // بستن WebApp بعد از 2 ثانیه
+                setTimeout(() => {
+                    tg.close();
+                }, 2000);
+                
+            } catch (error) {
+                console.error('❌ خطا در ارسال:', error);
+                tg.showAlert('خطا در ارسال اطلاعات: ' + error.message);
+            }
+        }
+
+        function testSendData() {
+            const testData = {
+                action: 'update_profile',
+                full_name: 'تست کاربر',
+                phone_number: '09123456789',
+                address: 'تهران - تست'
+            };
+
+            console.log('🧪 تست ارسال داده...');
+            console.log('WebApp Version:', tg.version);
+            console.log('Platform:', tg.platform);
+            console.log('sendData available:', typeof tg.sendData);
+            
+            alert('اطلاعات تست:\n' + JSON.stringify(testData, null, 2));
+            
+            if (tg.sendData) {
+                tg.sendData(JSON.stringify(testData));
+                alert('✅ داده ارسال شد! حالا ربات رو چک کن');
+                setTimeout(() => tg.close(), 1000);
+            } else {
+                alert('❌ tg.sendData موجود نیست!\n\nاین WebApp باید از طریق تلگرام باز شود.');
+            }
         }
 
         function loadRanking() {
@@ -1053,7 +1133,6 @@
                 userInfo = tg.initDataUnsafe.user;
                 document.getElementById('profileName').textContent = userInfo.first_name + (userInfo.last_name ? ' ' + userInfo.last_name : '');
                 document.getElementById('profileUsername').textContent = userInfo.username ? '@' + userInfo.username : '';
-                document.getElementById('fullName').value = userInfo.first_name + (userInfo.last_name ? ' ' + userInfo.last_name : '');
                 
                 // Set profile photo
                 if (userInfo.photo_url) {
@@ -1061,6 +1140,23 @@
                 } else {
                     document.getElementById('profileAvatar').src = 'https://via.placeholder.com/100/667eea/ffffff?text=' + userInfo.first_name.charAt(0);
                 }
+            }
+
+            // بارگذاری اطلاعات ذخیره شده از localStorage
+            const savedProfile = localStorage.getItem('userProfile');
+            if (savedProfile) {
+                try {
+                    const profile = JSON.parse(savedProfile);
+                    document.getElementById('fullName').value = profile.full_name || '';
+                    document.getElementById('phoneNumber').value = profile.phone_number || '';
+                    document.getElementById('address').value = profile.address || '';
+                    console.log('✅ اطلاعات پروفایل از حافظه بازیابی شد');
+                } catch (e) {
+                    console.error('خطا در بازیابی پروفایل:', e);
+                }
+            } else if (userInfo) {
+                // اگر ذخیره‌ای نداریم، از اطلاعات تلگرام استفاده کن
+                document.getElementById('fullName').value = userInfo.first_name + (userInfo.last_name ? ' ' + userInfo.last_name : '');
             }
 
             // Sample data (در پروژه واقعی از API دریافت شود)
@@ -1078,6 +1174,9 @@
                 document.documentElement.style.setProperty('--tg-bg', tg.themeParams.bg_color || '#ffffff');
                 document.documentElement.style.setProperty('--tg-text', tg.themeParams.text_color || '#000000');
             }
+
+            console.log('✅ WebApp راه‌اندازی شد');
+            console.log('User Info:', userInfo);
         });
     </script>
 </body>
