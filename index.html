@@ -967,33 +967,23 @@
             };
 
             console.log('📦 داده سفارش:', orderData);
+            const dataString = JSON.stringify(orderData);
 
-            try {
-                const dataString = JSON.stringify(orderData);
-                console.log('📤 ارسال سفارش به ربات:', dataString);
-                
-                if (tg.sendData) {
-                    tg.sendData(dataString);
-                    console.log('✅ سفارش ارسال شد');
-                    
-                    tg.showAlert('✅ سفارش شما ثبت شد!\n\nلطفاً منتظر تایید باشید.');
-                    
-                    // پاک کردن سبد خرید
-                    cart = [];
-                    updateCart();
-                    
-                    // بستن WebApp
-                    setTimeout(() => {
-                        tg.close();
-                    }, 1500);
-                } else {
-                    console.error('❌ tg.sendData موجود نیست!');
-                    tg.showAlert('خطا در ارسال سفارش. لطفاً دوباره تلاش کنید.');
-                }
-            } catch (error) {
-                console.error('❌ خطا در ارسال سفارش:', error);
-                tg.showAlert('خطا: ' + error.message);
-            }
+            // استفاده از MainButton
+            tg.MainButton.setText(`✅ ثبت سفارش (${formatPrice(total)})`);
+            tg.MainButton.show();
+            tg.MainButton.enable();
+            tg.MainButton.onClick(function() {
+                console.log('📤 ارسال سفارش...');
+                tg.sendData(dataString);
+                // پاک کردن سبد پس از ارسال
+                cart = [];
+                localStorage.removeItem('cart');
+            });
+            
+            // بستن modal و نمایش پیام
+            closeCart();
+            tg.showAlert('✅ سفارش آماده ثبت است!\n\nروی دکمه پایین صفحه کلیک کنید.');
         }
 
         function saveProfile() {
