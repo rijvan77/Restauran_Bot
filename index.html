@@ -967,33 +967,23 @@
             };
 
             console.log('📦 داده سفارش:', orderData);
+            const dataString = JSON.stringify(orderData);
 
-            try {
-                const dataString = JSON.stringify(orderData);
-                console.log('📤 ارسال سفارش به ربات:', dataString);
-                
-                if (tg.sendData) {
-                    tg.sendData(dataString);
-                    console.log('✅ سفارش ارسال شد');
-                    
-                    tg.showAlert('✅ سفارش شما ثبت شد!\n\nلطفاً منتظر تایید باشید.');
-                    
-                    // پاک کردن سبد خرید
-                    cart = [];
-                    updateCart();
-                    
-                    // بستن WebApp
-                    setTimeout(() => {
-                        tg.close();
-                    }, 1500);
-                } else {
-                    console.error('❌ tg.sendData موجود نیست!');
-                    tg.showAlert('خطا در ارسال سفارش. لطفاً دوباره تلاش کنید.');
-                }
-            } catch (error) {
-                console.error('❌ خطا در ارسال سفارش:', error);
-                tg.showAlert('خطا: ' + error.message);
-            }
+            // استفاده از MainButton
+            tg.MainButton.setText(`✅ ثبت سفارش (${formatPrice(total)})`);
+            tg.MainButton.show();
+            tg.MainButton.enable();
+            tg.MainButton.onClick(function() {
+                console.log('📤 ارسال سفارش...');
+                tg.sendData(dataString);
+                // پاک کردن سبد پس از ارسال
+                cart = [];
+                localStorage.removeItem('cart');
+            });
+            
+            // بستن modal و نمایش پیام
+            closeCart();
+            tg.showAlert('✅ سفارش آماده ثبت است!\n\nروی دکمه پایین صفحه کلیک کنید.');
         }
 
         function saveProfile() {
@@ -1013,32 +1003,23 @@
             localStorage.setItem('userProfile', JSON.stringify(profileData));
             console.log('✅ داده در localStorage ذخیره شد');
 
-            // تلاش برای ارسال به ربات
-            try {
-                const dataString = JSON.stringify(profileData);
-                console.log('📤 ارسال داده به ربات:', dataString);
-                
-                // روش 1: استفاده از sendData (استاندارد)
-                if (tg.sendData) {
-                    tg.sendData(dataString);
-                    console.log('✅ داده با sendData ارسال شد');
-                } else {
-                    console.error('❌ tg.sendData موجود نیست!');
-                }
-                
-                // نمایش پیام موفقیت
-                tg.showAlert('✅ اطلاعات ذخیره شد!\n\nبرای تکمیل ثبت، ربات را ببندید و دوباره باز کنید.');
-                tg.HapticFeedback.notificationOccurred('success');
-                
-                // بستن WebApp بعد از 2 ثانیه
-                setTimeout(() => {
-                    tg.close();
-                }, 2000);
-                
-            } catch (error) {
-                console.error('❌ خطا در ارسال:', error);
-                tg.showAlert('خطا در ارسال اطلاعات: ' + error.message);
-            }
+            // نمایش MainButton برای ارسال
+            const dataString = JSON.stringify(profileData);
+            console.log('📤 آماده‌سازی ارسال:', dataString);
+            
+            // روش صحیح: استفاده از MainButton
+            tg.MainButton.setText('✅ ذخیره اطلاعات');
+            tg.MainButton.show();
+            tg.MainButton.enable();
+            
+            // وقتی MainButton کلیک شد
+            tg.MainButton.onClick(function() {
+                console.log('🔘 MainButton کلیک شد');
+                tg.sendData(dataString);
+            });
+            
+            tg.showAlert('✅ اطلاعات آماده ارسال است!\n\nروی دکمه پایین صفحه کلیک کنید.');
+            tg.HapticFeedback.notificationOccurred('success');
         }
 
         function testSendData() {
@@ -1054,15 +1035,18 @@
             console.log('Platform:', tg.platform);
             console.log('sendData available:', typeof tg.sendData);
             
-            alert('اطلاعات تست:\n' + JSON.stringify(testData, null, 2));
+            const dataString = JSON.stringify(testData);
             
-            if (tg.sendData) {
-                tg.sendData(JSON.stringify(testData));
-                alert('✅ داده ارسال شد! حالا ربات رو چک کن');
-                setTimeout(() => tg.close(), 1000);
-            } else {
-                alert('❌ tg.sendData موجود نیست!\n\nاین WebApp باید از طریق تلگرام باز شود.');
-            }
+            // استفاده از MainButton برای تست
+            tg.MainButton.setText('🧪 ارسال داده تست');
+            tg.MainButton.show();
+            tg.MainButton.enable();
+            tg.MainButton.onClick(function() {
+                console.log('📤 ارسال تست...');
+                tg.sendData(dataString);
+            });
+            
+            tg.showAlert('✅ آماده ارسال!\n\nروی دکمه پایین صفحه کلیک کنید تا داده ارسال شود.');
         }
 
         function loadRanking() {
