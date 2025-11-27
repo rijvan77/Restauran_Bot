@@ -1031,22 +1031,32 @@
             };
 
             console.log('🧪 تست ارسال داده...');
-            console.log('WebApp Version:', tg.version);
-            console.log('Platform:', tg.platform);
-            console.log('sendData available:', typeof tg.sendData);
+            console.log('Test 1: Telegram =', typeof window.Telegram);
+            console.log('Test 2: WebApp =', typeof window.Telegram?.WebApp);
+            console.log('Test 3: sendData =', typeof tg.sendData);
+            console.log('Test 4: Version =', tg.version);
+            console.log('Test 5: Platform =', tg.platform);
             
             const dataString = JSON.stringify(testData);
             
-            // استفاده از MainButton برای تست
-            tg.MainButton.setText('🧪 ارسال داده تست');
-            tg.MainButton.show();
-            tg.MainButton.enable();
-            tg.MainButton.onClick(function() {
-                console.log('📤 ارسال تست...');
-                tg.sendData(dataString);
-            });
-            
-            tg.showAlert('✅ آماده ارسال!\n\nروی دکمه پایین صفحه کلیک کنید تا داده ارسال شود.');
+            // روش جدید: استفاده از switchInlineQuery
+            if (tg.switchInlineQuery) {
+                console.log('✅ استفاده از switchInlineQuery');
+                // این روش داده رو به عنوان query می‌فرسته
+                tg.switchInlineQuery(dataString, ['users', 'bots']);
+            } else if (tg.sendData) {
+                console.log('✅ استفاده از sendData');
+                tg.MainButton.setText('🧪 ارسال تست');
+                tg.MainButton.show();
+                tg.MainButton.onClick(() => {
+                    console.log('📤 ارسال...');
+                    tg.sendData(dataString);
+                });
+                tg.showAlert('روی دکمه پایین کلیک کن');
+            } else {
+                console.error('❌ هیچ روش ارسالی موجود نیست!');
+                alert('خطا: WebApp به درستی لود نشده!\n\nلطفاً ربات را ببند و دوباره باز کن.');
+            }
         }
 
         function loadRanking() {
